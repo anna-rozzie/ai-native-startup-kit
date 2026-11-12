@@ -15,3 +15,8 @@ Format:
 **What happened:** Every audio file, even a valid WAV, failed to decode with `open() got an unexpected keyword argument 'metadata_errors'`. Our code turned it into "could not be read as audio", which hid the real cause.
 **Cause:** `pip install faster-whisper` pulled PyAV 19, which removed an option that faster-whisper 1.2.1 still passes.
 **Rule from now on:** Install from the pinned `requirements.txt` (PyAV 15.1.0). When a friendly error appears for a file that should work, print the underlying exception before changing code.
+
+## 2026-11-13, A file named ".wav" has no extension in Python
+**What happened:** The test for an upload named just `.wav` was rejected as the wrong file type.
+**Cause:** Python's `PurePath(".wav").suffix` is empty, because a name starting with a dot counts as a hidden file, not an extension.
+**Rule from now on:** Read the extension and the name stem with the same helper logic, and keep an edge-case test for odd names.
