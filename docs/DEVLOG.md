@@ -25,3 +25,9 @@ Format:
 **Changed:** Added the local server `app/server.py`: `POST /transcribe` takes one audio upload, checks type and size, transcribes it with `app/transcribe.py`, and returns `{"text", "filename"}` or `{"error"}` in plain language. Uploads go to a temp file that is always deleted. Tests in `tests/test_server.py`. Server packages added to `requirements.txt`.
 **Why:** Issue #2 (`issues/2-upload-server.md`), FOCUS vital few #1 and #4.
 **Tests:** `pytest`: 19 passed (13 new; tests written first and failed before the code). Live check with `curl` against `uvicorn` on 127.0.0.1:8000: 2-minute memo returned 200 with 360 words in 18.3 s; PDF and silence returned the right 400 messages; server listens on 127.0.0.1 only; no temp files left.
+
+## 2026-11-13, Anna (with Claude)
+**Changed:** Added the page `app/static/index.html` (pick a file, "Working…", transcript, Download .txt, plain error messages; no outside requests), served at `GET /`. Added `scripts/done_check.py` for the FOCUS.md "done when" check, page tests in `tests/test_page.py`, and run steps at the top of `README.md`.
+**Why:** Issue #3 (`issues/3-upload-page.md`), FOCUS vital few #2 and #3.
+**Tests:** `pytest`: 24 passed (5 new; written first and failed before the page existed). `done_check.py` against the live server: PASS, 2-minute memo in 18.1 s, 360 words, name `long_memo.txt`. Browser check: clip transcribed word for word; download saved the same text as `fox memo.txt`; a PDF showed "Please upload an mp3, m4a, wav or webm file."; choosing a new file cleared the old transcript.
+**Goal:** FOCUS.md "done when" is met.

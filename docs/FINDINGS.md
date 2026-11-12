@@ -20,3 +20,8 @@ Format:
 **What happened:** The test for an upload named just `.wav` was rejected as the wrong file type.
 **Cause:** Python's `PurePath(".wav").suffix` is empty, because a name starting with a dot counts as a hidden file, not an extension.
 **Rule from now on:** Read the extension and the name stem with the same helper logic, and keep an edge-case test for odd names.
+
+## 2026-11-13, A browser can be tested end to end without clicking a file picker
+**What happened:** The browser test needed a real audio file in the file picker, which a script cannot open.
+**Cause:** File pickers only open on a real click, by design.
+**Rule from now on:** In browser checks, build a `File` from fetched bytes and set it on the input with `DataTransfer`, then click the real buttons. Capture downloads by wrapping `URL.createObjectURL`, since the page frees the link right after saving.
