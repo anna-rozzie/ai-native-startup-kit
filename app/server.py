@@ -6,11 +6,11 @@ Run: .venv/bin/uvicorn app.server:app --host 127.0.0.1 --port 8000
 import logging
 import os
 import tempfile
-from pathlib import PurePath
+from pathlib import Path, PurePath
 
 from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 from app.transcribe import TranscribeError, transcribe
 
@@ -62,6 +62,14 @@ def _save_to_temp(upload: UploadFile, suffix: str) -> str:
         os.unlink(path)
         raise
     return path
+
+
+PAGE = Path(__file__).parent / "static" / "index.html"
+
+
+@app.get("/")
+def home() -> FileResponse:
+    return FileResponse(PAGE, media_type="text/html; charset=utf-8")
 
 
 @app.post("/transcribe")

@@ -1,3 +1,24 @@
+# Transcriber
+
+Upload a recording and get the text back, on your own Mac. Free, private, no account or API key. Built with the AI-Native Startup kit below.
+
+## Run the transcriber
+
+1. Set up once (downloads about 480 MB the first time you transcribe):
+   ```bash
+   python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+   ```
+2. Start it:
+   ```bash
+   .venv/bin/uvicorn app.server:app --host 127.0.0.1 --port 8000
+   ```
+3. Open http://127.0.0.1:8000 in your browser, choose an mp3, m4a, wav or webm file (up to 50 MB and 15 minutes), and click **Transcribe**.
+4. Click **Download .txt** to save the text. Stop the server with Ctrl+C.
+
+To run the checks: `bash tests/make_fixtures.sh && .venv/bin/pytest -q`, then, with the server running, `.venv/bin/python scripts/done_check.py`.
+
+---
+
 # AI-Native Startup starter kit
 
 A shared setup for a small team where everyone builds with AI on their own computer. Copy this folder into a new GitHub repo, and every teammate's AI reads the same rules, the same scope, and the same history.
