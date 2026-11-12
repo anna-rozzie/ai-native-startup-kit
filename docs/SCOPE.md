@@ -32,6 +32,7 @@
 | 2026-11-13 | Model `small`, falling back to `base` if too slow | Good accuracy for clear speech; must meet the under-a-minute target on an M3 with 8 GB |
 | 2026-11-13 | Python server + one HTML page, localhost only | Simplest stack that keeps the work on one machine |
 | 2026-11-13 | Limits: 50 MB and 15 minutes per file | Keeps waits reasonable on a laptop |
+| 2026-11-13 | Keep model `small` on CPU | Measured 17.7 s for a 128 s memo on the M3, well under 60 s (issue #1) |
 
 ## Open questions
-- Does `small` transcribe a 2-minute memo in under a minute on this Mac? Measured in the first ticket.
+- None right now.

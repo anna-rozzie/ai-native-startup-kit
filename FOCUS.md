@@ -18,5 +18,6 @@
 - Accounts and saved history
 
 ## Parked
+- 2026-11-13 Try `device="mps"` (Apple GPU, experimental) for faster transcription; CPU already meets the target.
 
 _Set 2026-11-13. Revised: -_
