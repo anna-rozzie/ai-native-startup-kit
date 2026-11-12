@@ -44,5 +44,5 @@ API keys and passwords go in `.env`, which is in `.gitignore`. Never commit one.
 ## Our conventions
 
 <!-- Add your own: stack, naming, tone, what the product must never do. -->
-- Stack:
+- Stack: Python 3.13 in `.venv/`, faster-whisper (local), FastAPI + one plain HTML page, pytest. Localhost only.
 - Plain language in everything users read.
