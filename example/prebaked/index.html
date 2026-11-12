@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Discovery Log</title>
+<style>
+:root{--ink:#111827;--mute:#6B7280;--line:#E5E7EB;--bg:#FAFAFA;--card:#fff;--accent:#4F46E5;--tint:#EEF2FF}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+main{max-width:1040px;margin:0 auto;padding:28px 16px 60px;display:grid;gap:24px;grid-template-columns:1fr 1fr}
+header{grid-column:1/-1}h1{margin:0;font-size:30px}header p{margin:4px 0 0;color:var(--mute)}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+h2{margin:0 0 12px;font-size:18px}label{display:block;font-size:13px;font-weight:600;color:var(--mute);margin:10px 0 4px}
+input,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}
+textarea{min-height:72px;resize:vertical}input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+button{font:inherit;font-weight:600;border:0;border-radius:8px;padding:10px 16px;cursor:pointer}
+.primary{background:var(--accent);color:#fff;margin-top:14px}.ghost{background:none;color:var(--mute);padding:2px 6px;font-weight:400}
+.error{color:#B91C1C;font-size:14px;min-height:20px;margin:6px 0 0}
+.bar{display:grid;grid-template-columns:150px 1fr 64px;gap:10px;align-items:center;margin:8px 0;font-size:15px}
+.track{background:var(--tint);border-radius:6px;height:22px;overflow:hidden}.fill{background:var(--accent);height:100%;border-radius:6px}
+.count{color:var(--mute);font-size:13px;text-align:right}
+.item{border-top:1px solid var(--line);padding:12px 0}.item:first-child{border-top:0}
+.who{font-weight:600}.date{color:var(--mute);font-size:13px;margin-left:8px}
+.tag{display:inline-block;background:var(--tint);color:var(--accent);border-radius:99px;padding:2px 10px;font-size:13px;margin:6px 6px 0 0}
+.empty{color:var(--mute)}#list{grid-column:1/-1}.row{display:flex;justify-content:space-between;align-items:baseline}
+@media(max-width:760px){main{grid-template-columns:1fr}.bar{grid-template-columns:110px 1fr 56px}}
+</style></head><body><main>
+<header><h1>Discovery Log</h1><p>Log every customer conversation. See which pains keep coming up.</p></header>
+<section><h2>New interview</h2>
+<form id="form">
+<label for="who">Who did you talk to?</label><input id="who" placeholder="Sam, ops lead at a 20-person startup">
+<label for="pains">Pains you heard (comma separated)</label><input id="pains" placeholder="pricing, slow onboarding">
+<label for="notes">Notes</label><textarea id="notes" placeholder="What did they say in their own words?"></textarea>
+<button class="primary">Add interview</button><p class="error" id="error" role="alert"></p>
+</form></section>
+<section><h2>Top pains</h2><div id="pains-chart"></div></section>
+<section id="list"><div class="row"><h2>Interviews <span class="date" id="total"></span></h2><button class="ghost" id="sample">Load sample data</button></div><div id="items"></div></section>
+</main>
+<script src="logic.js"></script>
+<script>
+var list = DL.load(localStorage);
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function render(){
+  var top = DL.topPains(list), max = top.length ? top[0].count : 1;
+  document.getElementById("pains-chart").innerHTML = top.length ? top.slice(0,8).map(function(p){
+    return '<div class="bar"><span>'+esc(p.pain)+'</span><div class="track"><div class="fill" style="width:'+(p.count/max*100)+'%"></div></div><span class="count">'+p.count+' of '+list.length+'</span></div>';
+  }).join("") : '<p class="empty">Tag a pain in an interview and it shows up here.</p>';
+  document.getElementById("total").textContent = list.length ? list.length + " logged" : "";
+  document.getElementById("items").innerHTML = list.length ? list.map(function(i){
+    return '<div class="item"><div class="row"><div><span class="who">'+esc(i.who)+'</span><span class="date">'+esc(i.date)+'</span></div><button class="ghost" data-id="'+esc(i.id)+'">Remove</button></div>'+
+      (i.notes?'<div>'+esc(i.notes)+'</div>':'')+i.pains.map(function(p){return '<span class="tag">'+esc(p)+'</span>';}).join("")+'</div>';
+  }).join("") : '<p class="empty">No interviews yet. Add your first one above.</p>';
+}
+document.getElementById("form").addEventListener("submit",function(e){
+  e.preventDefault();
+  var r = DL.addInterview(list,{who:who.value,pains:pains.value,notes:notes.value});
+  document.getElementById("error").textContent = r.ok ? "" : r.error;
+  if(!r.ok) return;
+  list = r.list; DL.save(localStorage,list); e.target.reset(); who.focus(); render();
+});
+document.getElementById("items").addEventListener("click",function(e){
+  var id = e.target.getAttribute("data-id"); if(!id) return;
+  list = DL.removeInterview(list,id); DL.save(localStorage,list); render();
+});
+document.getElementById("sample").addEventListener("click",function(){
+  [["Priya, founder, 4-person fintech","manual reporting, pricing","Spends Friday afternoons copying numbers into a spreadsheet."],
+   ["Marcus, ops lead, logistics startup","manual reporting, slow onboarding","New hires take three weeks to learn the tools."],
+   ["Dana, solo founder, health app","pricing, no time to learn tools","Would pay if it saved an hour a week."],
+   ["Leo, CTO, 12-person SaaS","manual reporting, tool sprawl","Seven tools, none of them talk to each other."],
+   ["Aisha, COO, marketplace","slow onboarding, manual reporting","Reporting is the thing she dreads most."]
+  ].forEach(function(s){ list = DL.addInterview(list,{who:s[0],pains:s[1],notes:s[2]}).list; });
+  DL.save(localStorage,list); render();
+});
+render();
+</script></body></html>
